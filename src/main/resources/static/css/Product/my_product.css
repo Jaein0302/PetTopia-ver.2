@@ -1,0 +1,13 @@
+.m_product {
+  width : 600px;
+  margin : 0 auto;
+  padding : 40px
+}
+
+.add { float : right }
+
+.m_product table tbody td {font-size : 10pt}
+
+.page-link { color : darkgrey !important; }
+
+#preview { width: 150px; height: 150px;}

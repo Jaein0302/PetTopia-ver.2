@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" ?><!-- SQL 맵퍼 파일은 xml이기 때문에 제일 먼저 xml 
+	선언이 옵니다. -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.Pet_Topia.mybatis.mapper.CommunityMapper">
+	
+	<sql id="search_">
+   	<if test="search_field!=null">
+      where 
+       <choose>
+          <when test="search_field=='commu_subject'">commu_subject</when>
+          <when test="search_field=='commu_name'">commu_name</when>
+          <when test="search_field=='commu_content'">commu_content</when>
+       </choose>
+        like #{search_word} 
+      </if>
+   </sql>
+	
+	
+	<select id="getListCount" resultType="int">
+		select count(*) from community
+		<include refid="search_"/>
+	</select>
+
+	<select id="getBoardList" parameterType="java.util.Map"	resultType="community">
+		select * 
+			from ( select rownum rnum, b.*
+			  from (select community.*,  nvl(cnt,0) cnt
+					from community left outer join (select COMMUNITY_COMM.COMMENT_COMMU_NUM, count(*) cnt
+												 from COMMUNITY_COMM
+												 group by COMMUNITY_COMM.COMMENT_COMMU_NUM) c
+					on community.COMMU_NUM = c.COMMENT_COMMU_NUM
+					<include refid="search_"/>
+					order by community.COMMU_NUM desc	) b
+			  where rownum &lt;= #{end}
+			)
+		where rnum &gt;= #{start} and rnum &lt;= #{end}
+	</select>
+	
+
+	<insert id="insert" parameterType="community">
+		<selectKey resultType="int" order="BEFORE" keyProperty="commu_num">
+			select nvl(max(commu_num),0)+1 from community
+		</selectKey>
+		insert into community
+		values
+		(#{commu_num},
+		#{commu_name}, #{commu_subject}, 
+		#{commu_content}, #{commu_readcount}, 
+		sysdate,#{commu_thumbnail, jdbcType=VARCHAR},
+		#{commu_file, jdbcType=VARCHAR},
+		#{commu_original, jdbcType=VARCHAR})
+	</insert>
+	
+	<update id="setReadCountUpdate" parameterType="int" >
+		update community 
+		set commu_readcount = commu_readcount + 1 
+		where commu_num = #{number}
+	</update>
+	
+	<select id="getDetail" parameterType="int" resultType="community">
+		select community.*,  nvl(cnt,0) cnt
+		from community left outer join (select COMMUNITY_COMM.COMMENT_COMMU_NUM, count(*) cnt
+										 from COMMUNITY_COMM
+										 group by COMMUNITY_COMM.COMMENT_COMMU_NUM) c
+		on community.COMMU_NUM = c.COMMENT_COMMU_NUM
+		where community.commu_num = #{number}
+	</select>
+	
+	<delete id="delete" parameterType="int">
+		delete community
+		where commu_num = #{number}
+	</delete>
+	
+	<select id="hot_list" resultType="community">
+		select *
+		 from ( select community.*, nvl(cnt,0) cnt
+				from community left outer join (select COMMUNITY_COMM.COMMENT_COMMU_NUM, count(*) cnt
+												from COMMUNITY_COMM
+												group by COMMUNITY_COMM.COMMENT_COMMU_NUM) c
+				on community.COMMU_NUM = c.COMMENT_COMMU_NUM
+				order by community.COMMU_NUM desc) c
+		 WHERE c.COMMU_DATE >= TO_CHAR(SYSDATE-7,'YYYYMMDD')
+		 order by cnt desc, COMMU_READCOUNT desc
+	</select>
+	
+	<update id="update" parameterType="community">
+		update community
+		set commu_subject=#{commu_subject}, commu_content=#{commu_content}, commu_thumbnail=#{commu_thumbnail},
+		commu_file=#{commu_file, jdbcType=VARCHAR}, commu_original=#{commu_original, jdbcType=VARCHAR}
+		where commu_num = #{commu_num}
+	</update>
+	
+	<select id="mygetListCount" parameterType="String" resultType="int">
+		select count(*) from community
+		where commu_name = #{member_id}
+	</select>
+	
+	<select id="mygetPostList" parameterType="java.util.Map"	resultType="community">
+		select * 
+			from ( select rownum rnum, b.*
+			  from (select community.*
+					from community 
+					where commu_name = #{member_id}
+					order by commu_date desc) b
+			  where rownum &lt;= #{end}
+			)
+		where rnum &gt;= #{start} and rnum &lt;= #{end}
+	</select>
+</mapper>

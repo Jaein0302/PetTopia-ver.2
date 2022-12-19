@@ -1,0 +1,132 @@
+
+.fakeimg {
+    height: 350px;
+    width: 350px;
+    background: #aaa;
+  }
+  
+
+.tab > section > p {
+            margin: 0 0 20px;
+            line-height: 1.5;}
+                
+.tab > section {
+            display: none;
+            padding: 20px 0 0;
+            border-top: 1px solid #ddd;}
+
+        /*라디오버튼 숨김*/
+#tab1  {
+              display: none;}
+#tab2  {
+              display: none;}
+#tab3  {
+              display: none;}
+#tab4  {
+              display: none;}
+
+.tab > label {
+            display: inline-block;
+            margin: 0 0px -1px;
+            padding: 15px 76px;
+            font-weight: 600;
+            text-align: center;
+            color: #bbb;
+            border: 1px solid transparent;}
+
+.tab > label:hover {
+            color: #2e9cdf;
+            cursor: pointer;}
+
+        /*input 클릭시, label 스타일*/
+.tab > input:checked + label {
+              color: #555;
+              border: 1px solid #ddd;
+              border-top: 1px solid black;
+              border-bottom: 1px solid #ffffff;}
+
+        #tab1:checked ~ #content1,
+        #tab2:checked ~ #content2,
+        #tab3:checked ~ #content3,
+        #tab4:checked ~ #content4 {
+            display: block;}
+            
+            /* 페이징 css */
+.pagination-div {
+	position: relative;
+	left: 46%!important;
+	top: 52%!important;
+}
+
+.pagination {
+	list-style: none;
+	padding: 0;
+	margin-top: 10px;
+}
+
+.pagination li {
+	display: inline-block;
+	text-align: center;
+}
+
+.pagination a {
+	float: left;
+	display: block;
+	font-size: 14px;
+	text-decoration: none;
+	padding: 6.3px 12px !important;
+	color: #fff;
+	margin-left: -1px;
+	border: 1px solid transparent;
+	line-height: 1.5;
+}
+
+.pagination a.active {
+	cursor: default;
+}
+
+.pagination a:active {
+	outline: none;
+}
+
+.modal-1 li:first-child a {
+	-moz-border-radius: 6px 0 0 6px;
+	-webkit-border-radius: 6px;
+	border-radius: 6px 0 0 6px;
+}
+
+.modal-1 li:last-child a {
+	-moz-border-radius: 0 6px 6px 0;
+	-webkit-border-radius: 0;
+	border-radius: 0 6px 6px 0;
+}
+
+.modal-2 li:first-child a {
+	-moz-border-radius: 50px 0 0 50px;
+	-webkit-border-radius: 50px;
+	border-radius: 50px 0 0 50px;
+}
+
+.modal-2 li:last-child a {
+	-moz-border-radius: 0 50px 50px 0;
+	-webkit-border-radius: 0;
+	border-radius: 0 50px 50px 0;
+}
+
+.modal-2 a {
+	border-color: #ddd;
+	color: #999;
+	background: #fff;
+}
+
+.modal-2 a:hover {
+	color: #e7cc87;
+	background-color: #eee;
+}
+
+.modal-2 a.active, .modal-2 a:active {
+	border-color: #e7cc87;
+	background: #e7cc87;
+	color: #fff;
+}
+            

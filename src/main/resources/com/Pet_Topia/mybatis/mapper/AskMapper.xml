@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.Pet_Topia.mybatis.mapper.AskMapper">
+	
+	 <insert id="insertAsk" parameterType="itemAsk">
+	 	<selectKey resultType="int" order="BEFORE" keyProperty="ITEM_ASK_NUM">
+			select nvl(max(ITEM_ASK_NUM),0) +1
+			from ITEM_ASK
+		</selectKey>
+
+		insert into ITEM_ASK
+		(ITEM_ASK_NUM, ITEM_ASK_USERNAME, ITEM_ASK_ITEMID, ITEM_ASK_SUBJECT, ITEM_ASK_CONTENT, ITEM_ASK_DATE)
+		values
+		(#{ITEM_ASK_NUM}, #{ITEM_ASK_USERNAME}, #{ITEM_ASK_ITEMID}, #{ITEM_ASK_SUBJECT}, #{ITEM_ASK_CONTENT}, sysdate)
+	</insert>
+	
+	<select id = "getListCount" parameterType="product" resultType="int">
+		select count(*) 
+		from ITEM_ASK 
+		where ITEM_ASK_ITEMID = #{ITEM_ID}
+	</select>
+	 
+	<select id="getAskList" parameterType="map" resultType="ItemAsk">
+		select *
+		from(select rownum rnum, a.*
+		 	 from (select * 
+			   	   from ITEM_ASK
+			   	   order by ITEM_ASK_DATE desc) a
+		 	 where rownum &lt;= #{end}
+		 	)
+		where rnum &gt;= #{start} and rnum &lt;= #{end}
+		and ITEM_ASK_ITEMID = #{product.ITEM_ID}		
+	</select>
+	
+	<update id="updateAsk" parameterType="ItemAsk">
+		update ITEM_ASK
+		set ITEM_ASK_SUBJECT = #{ITEM_ASK_SUBJECT},
+			ITEM_ASK_CONTENT = #{ITEM_ASK_CONTENT}	
+		where ITEM_ASK_NUM = #{ITEM_ASK_NUM}	
+	</update>	
+	
+	<delete id="askDelete" parameterType="int">
+		delete ITEM_ASK
+		where ITEM_ASK_NUM = #{ITEM_ASK_NUM}	
+	</delete>
+		
+	<select id = "getAnswerCount" parameterType="int" resultType="int">
+		select count(*) 
+		from ITEM_ASK
+		where ITEM_ASK_ITEMID = #{ITEM_ID}
+	</select>
+	
+	<select id="getAskList2" parameterType="int" resultType="ItemAsk">  <!-- answer에서 asklist부르기 -->
+		select *
+		from ITEM_ASK, ITEM
+		where ITEM_ASK.ITEM_ASK_ITEMID = ITEM.ITEM_ID
+		and ITEM_ID = #{ITEM_ID}
+		order by ITEM_ASK_NUM desc
+	</select>	
+	
+	<insert id="addAnswer" parameterType="ItemAnswer">
+		<selectKey resultType="int" order="BEFORE" keyProperty="ITEM_ANSWER_NUM">
+			select nvl(max(ITEM_ANSWER_NUM),0) +1
+			from ITEM_ANSWER
+		</selectKey>
+
+		insert into ITEM_ANSWER
+		(ITEM_ANSWER_NUM, ITEM_ANSWER_USERNAME, ITEM_ANSWER_CONTENT, ITEM_ANSWER_DATE, ITEM_ASK_NUM)
+		values
+		(#{ITEM_ANSWER_NUM}, #{ITEM_ANSWER_USERNAME}, #{ITEM_ANSWER_CONTENT}, sysdate, #{ITEM_ASK_NUM})
+	</insert>
+	
+	<select id="answerCheck" parameterType="int" resultType="String">
+		select count(ITEM_ANSWER_CONTENT)
+		from ITEM_ASK a, ITEM_ANSWER b
+		where a.ITEM_ASK_NUM = b.ITEM_ASK_NUM (+)
+		and a.ITEM_ASK_NUM in ( select ITEM_ASK_NUM
+								from ITEM_ASK
+								where ITEM_ASK_ITEMID = #{ITEM_ID} )
+		group by a.ITEM_ASK_NUM, ITEM_ANSWER_CONTENT
+		order by a.ITEM_ASK_NUM desc
+	</select>	
+	
+	<select id="getAnswerList" parameterType="int" resultType="ItemAnswer">
+		select *
+		from ITEM_ASK a, ITEM_ANSWER b
+		where a.ITEM_ASK_NUM = b.ITEM_ASK_NUM (+)
+		and a.ITEM_ASK_NUM in ( select ITEM_ASK_NUM
+								from ITEM_ASK
+								where ITEM_ASK_ITEMID = #{ITEM_ID} )	
+		order by a.ITEM_ASK_NUM desc
+	</select>	
+		
+	<update id="updateAnswer" parameterType="map">
+		update ITEM_ANSWER
+		set ITEM_ANSWER_CONTENT = #{ITEM_ANSWER_CONTENT}
+		where ITEM_ANSWER_NUM = #{ITEM_ANSWER_NUM}	
+	</update>	
+	
+	<select id = "getmyListCount" parameterType="String" resultType="int">
+		select count(*) 
+		from ITEM_ASK 
+		where ITEM_ASK_USERNAME = #{member_id}
+	</select>
+   
+   	<select id="getAskList3" parameterType="map" resultType="ItemAsk">   	
+   		select *
+		from(select rownum rnum, a.*
+			 from (select ITEM_ASK.* , ITEM.ITEM_NAME  
+			   	   from ITEM_ASK, ITEM 
+			   	   where ITEM_ASK.ITEM_ASK_ITEMID = ITEM.ITEM_ID
+			   	   order by ITEM_ASK_DATE desc) a
+		 	 where rownum &lt;= #{end}
+		 	)
+		where rnum &gt;= #{start} and rnum &lt;= #{end}
+		and ITEM_ASK_USERNAME = #{member_id}		
+	</select>
+</mapper>

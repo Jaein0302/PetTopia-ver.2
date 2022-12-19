@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.Pet_Topia.mybatis.mapper.ProductMapper">
+
+   <select id="getSearchList" parameterType="map" resultType="product">
+     select item.*,  nvl(cnt,0) cnt, m.member_name seller_name
+	  from item left outer join (select review.review_item_id, count(*) cnt
+									from review
+									group by review_item_id) c
+	  on item.item_id = c.review_item_id
+	  join member m
+	  on item.item_seller = m.member_id
+      where ITEM_CATEGORY = #{category}
+      <include refid="search1"/>
+   </select> 
+   
+   <sql id="search1">   
+     <if test='index == 1'>
+   	 	and ITEM_NAME like #{search_word}      
+     </if>
+   </sql>
+   
+   <select id="getListAjax" parameterType="map" resultType="product">
+     select item.*,  nvl(cnt,0) cnt,  m.member_name seller_name
+	  from item left outer join (select review.review_item_id, count(*) cnt
+									from review
+									group by review_item_id) c
+	  on item.item_id = c.review_item_id	  
+	  join member m
+	  on item.item_seller = m.member_id
+      where ITEM_CATEGORY = 'treat'      
+      <include refid="search2"/>
+   </select> 
+   
+   <sql id="search2">
+          <if test="sex!=''">and ITEM_SEX = #{sex}</if>
+          <if test="weight!=''">and ITEM_WEIGHT = #{weight}</if>
+          <if test="species!=''">and ITEM_SPECIES = #{species}</if>
+   </sql>
+   
+   	<insert id="insertProduct" parameterType="product">
+         <selectKey resultType="int" order="BEFORE" keyProperty="ITEM_ID">
+            <choose>           
+               <when test ='ITEM_CATEGORY == "treat"'>
+               select nvl(max(ITEM_ID),10000)+1 from item where ITEM_CATEGORY = 'treat'
+               </when>
+               <when test ='ITEM_CATEGORY == "education"'>
+               select nvl(max(ITEM_ID),20000)+1 from item where ITEM_CATEGORY = 'education'
+               </when>
+               <when test ='ITEM_CATEGORY == "beauty"'>
+               select nvl(max(ITEM_ID),30000)+1 from item where ITEM_CATEGORY = 'beauty'
+            </when>
+         </choose>      
+      </selectKey>
+      insert into item
+      (ITEM_ID, ITEM_NAME, ITEM_CATEGORY, ITEM_PRICE, ITEM_CONTENT, ITEM_IMAGE_ORIGINAL, ITEM_IMAGE_FILE, ITEM_REG_DATE,
+       ITEM_SEX, ITEM_WEIGHT, ITEM_SPECIES, ITEM_ADDRESS, ITEM_SELLER, MEMBER_ID)
+      values
+      (#{ITEM_ID}, #{ITEM_NAME}, #{ITEM_CATEGORY}, #{ITEM_PRICE}, #{ITEM_CONTENT}, #{ITEM_IMAGE_ORIGINAL}, #{ITEM_IMAGE_FILE}, sysdate,
+      #{ITEM_SEX, jdbcType=VARCHAR}, #{ITEM_WEIGHT, jdbcType=VARCHAR}, #{ITEM_SPECIES, jdbcType=VARCHAR}, #{ITEM_ADDRESS}, #{ITEM_SELLER}, #{MEMBER_ID})      
+   </insert>
+	
+   	<select id="getDetail" parameterType="int" resultType="product">
+	 select item.*,  nvl(cnt,0) cnt, m.member_name seller_name,
+	  m.member_tell seller_tell
+	  from item left outer join (select review.review_item_id, count(*) cnt
+									from review
+									group by review_item_id) c
+	  on item.item_id = c.review_item_id
+	  join member m
+	  on item.item_seller = m.member_id
+      where ITEM_ID = #{ITEM_ID}
+	</select>
+	
+	<select id="getListCount" resultType="int">
+		select count(*) from item
+	</select>
+	
+	<select id="getProductList" parameterType="java.util.Map"	resultType="product">
+		select *
+		from(select rownum rnum, a.*
+		 	 from (select * 
+			   	   from item
+			   	   where MEMBER_ID = #{member_id}
+			   	   order by ITEM_REG_DATE desc) a
+		 	 where rownum &lt;= #{end}
+		 	)
+		where rnum &gt;= #{start} and rnum &lt;= #{end}
+	</select>
+	
+	<update id="productUpdate" parameterType="product">
+		update item 
+		
+		set ITEM_NAME = #{ITEM_NAME}, 
+			ITEM_CATEGORY = #{ITEM_CATEGORY}, 
+			ITEM_PRICE = #{ITEM_PRICE},
+			ITEM_CONTENT = #{ITEM_CONTENT},   
+			ITEM_IMAGE_ORIGINAL = #{ITEM_IMAGE_ORIGINAL},   
+			ITEM_IMAGE_FILE = #{ITEM_IMAGE_FILE},   
+			ITEM_SEX = #{ITEM_SEX},   
+			ITEM_WEIGHT = #{ITEM_WEIGHT},   
+			ITEM_SPECIES = #{ITEM_SPECIES}
+			
+		where ITEM_ID = #{ITEM_ID}
+	</update> 
+	
+	<delete id="productDelete" parameterType="Int">
+		delete from item  
+		where  ITEM_ID = #{ITEM_ID}	
+	</delete>
+	
+	<insert id="OrderInsert"  parameterType="OrderInfo">
+		insert into ORDERINFO
+		(order_id, order_member_id, order_item_id, order_item_sellerName, 
+		order_item_name, order_item_price, order_time, order_location, order_image, order_item_tell, order_member_tell )
+		values
+		(order_seq.nextval , #{order_member_id}, #{order_item_id}, #{order_item_sellerName}, 
+		#{order_item_name}, #{order_item_price}, #{order_time}, #{order_location}, #{order_image}, #{order_item_tell},#{order_member_tell})		
+	</insert>
+	
+	<select id="getmyListCount" parameterType="String" resultType="int">
+		select count(*)
+		from item
+		where MEMBER_ID = #{member_id}
+	</select>
+	
+	
+	<select id="checkWish" resultType="integer">
+		select *
+		from wish
+		where WISH_ITEM_ID = #{iTEM_ID}
+		and WISH_MEMBER_ID = #{member_id}
+	</select>
+	
+  
+	<insert id="WishInsert" parameterType="wish">
+		insert into wish
+		(WISH_ID, WISH_ITEM_ID, WISH_MEMBER_ID, WISH_ITEM_NAME, WISH_ITEM_IMAGE, WISH_RSV_DATE, WISH_ITEM_PRICE)
+		values
+		(wish_seq.NEXTVAL, #{WISH_ITEM_ID}, #{WISH_MEMBER_ID} , #{WISH_ITEM_NAME}, #{WISH_ITEM_IMAGE}, SYSDATE, #{WISH_ITEM_PRICE})
+	</insert>
+	
+	<select id="getMyWishCount" parameterType="String" resultType="int">
+		select count(*)
+		from wish
+		where WISH_MEMBER_ID = #{member_id}
+	</select>
+	
+	<select id="getMyWishList" parameterType="map" resultType="wish">
+		select * 
+			from ( select rownum rnum, b.*
+			  from (select wish.*
+					from wish 
+					where wish_member_id = #{member_id}
+					order by wish_rsv_date desc) b
+			  where rownum &lt;= #{end}
+			)
+		where rnum &gt;= #{start} and rnum &lt;= #{end}
+	</select>
+	
+	<delete id="deleteWish" parameterType="int">
+		delete wish
+		where wish_id = #{wish_id}
+	</delete>
+	
+</mapper>

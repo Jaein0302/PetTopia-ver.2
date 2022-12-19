@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.Pet_Topia.mybatis.mapper.OrderMapper">
+
+	<insert id="insert" parameterType="review">
+		<selectKey resultType="int" order="BEFORE" keyProperty="review_num">
+			select nvl(max(review_num),0)+1 from review
+		</selectKey>
+		insert into review
+		values
+		(#{review_num},
+		#{review_id}, #{review_item_id}, 
+		#{review_score}, #{review_subject}, #{review_content}, 
+		#{review_text},
+		sysdate,#{review_image, jdbcType=VARCHAR})
+	</insert>
+
+	<select id="getListCount" resultType="int">
+		select count(*) from review
+		where review_item_id = #{ITEM_ID}
+	</select>
+
+	<select id="getBoardList" parameterType="java.util.Map"	resultType="review">
+		select * 
+			from ( select rownum rnum, b.*
+			  from (select review.*
+					from review 
+					where review_item_id = #{ITEM_ID}
+					order by review.review_reg_date desc) b
+			  where rownum &lt;= #{end}
+			)
+		where rnum &gt;= #{start} and rnum &lt;= #{end}
+	</select>
+	
+	<select id="mygetListCount" resultType="int">
+		select count(*) from review
+		where review_id = #{member_id}
+	</select>
+
+	<select id="mygetBoardList" parameterType="java.util.Map"	resultType="review">
+		select * 
+			from ( select rownum rnum, b.*
+			  from (select review.* , item.*
+					from review left outer join item
+	 				on review.review_item_id = item.item_id
+					where review_id = #{member_id}
+					order by review.review_reg_date desc) b
+			  where rownum &lt;= #{end}
+			)
+		where rnum &gt;= #{start} and rnum &lt;= #{end}
+	</select>
+	
+	<select id="starAVG" parameterType="int" resultType="Double">
+		select avg(review_score)
+  		from review
+  		where review_item_id = #{review_item_id}
+	</select>
+	
+	<update id="starUpdate" parameterType="product">
+		update item 
+		set ITEM_SCORE = #{ITEM_SCORE}
+		where item_id = #{ITEM_ID}
+	</update>
+	
+	<select id="getPhoto" resultType="review">
+		select * from review
+		where review_image is not null
+		and review_item_id = #{ITEM_ID}
+		order by review_reg_date desc
+	</select>
+	
+	<select id="getDetail" resultType="review">
+		select * from review
+		where review_num = #{review_num}
+	</select>
+	
+	<delete id="review_del">
+		delete from review
+		where review_num = #{review_num}
+	</delete>
+	
+</mapper>

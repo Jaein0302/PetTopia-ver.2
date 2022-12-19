@@ -1,0 +1,68 @@
+h4{
+  font-family:'JUA';
+  color:#9c9c9c;
+  font-weight:500;
+  font-size:26px;
+  padding-left:10px
+}
+#myPageName {
+  text-align: left;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+#myPageName * {
+  box-sizing: border-box;
+}
+#myPageName li {
+  display: inline-block;
+  list-style: outside none none;
+  margin: 0 1em;
+  padding: 0;
+}
+#myPageName a {
+  padding: 0.5em 0;
+  color: #454545;
+  position: relative;
+  letter-spacing: 1px;
+  text-decoration: none;
+}
+#myPageName a:before,
+#myPageName a:after {
+  position: absolute;
+  -webkit-transition: all 0.35s ease;
+  transition: all 0.35s ease;
+}
+#myPageName a:before {
+  bottom: 0;
+  display: block;
+  height: 3px;
+  width: 0%;
+  content: "";
+  background-color: #efd69a;
+}
+#myPageName a:after {
+  left: 0;
+  top: 0;
+  padding: 0.5em 0;
+  position: absolute;
+  content: attr(data-hover);
+  white-space: nowrap;
+  max-width: 0%;
+  overflow: hidden;
+}
+#myPageName a:hover:before,
+#myPageName .current a:before {
+  opacity: 1;
+  width: 100%;
+}
+#myPageName a:hover:after,
+#myPageName .current a:after {
+  max-width: 100%;
+}
+#myPageName >li> .navActive{
+  background:
+   linear-gradient(#efd69a,#efd69a) 
+   bottom 1px center/ /* Position */
+   100% 3.2px  /*width height*/
+   no-repeat;
+}

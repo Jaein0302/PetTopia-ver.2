@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.Pet_Topia.mybatis.mapper.OrderMapper">
+
+	<insert id="insert" parameterType="review">
+		insert into review
+		values
+		(#{review_num},
+		#{review_id}, #{review_item_id}, 
+		#{review_score}, #{review_subject}, #{review_content}, 
+		#{review_text},
+		sysdate,#{review_image, jdbcType=VARCHAR})
+	</insert>
+
+	<select id="getListCount" resultType="int">
+		select count(*) from review
+		where review_item_id = #{ITEM_ID}
+	</select>
+
+	<select id="getBoardList" parameterType="java.util.Map"	resultType="review">
+		select * 
+			from ( select rownum rnum, b.*
+			  from (select review.*
+					from review 
+					where review_item_id = #{ITEM_ID}
+					order by review.review_reg_date desc) b
+			  where rownum &lt;= #{end}
+			)
+		where rnum &gt;= #{start} and rnum &lt;= #{end}
+	</select>
+	
+	<select id="mygetListCount" resultType="int">
+		select count(*) from review
+		where review_id = #{member_id}
+	</select>
+
+	<select id="mygetBoardList" parameterType="java.util.Map"	resultType="review">
+	select * 
+			from ( select rownum rnum, b.*
+			  from (select review.* , orderinfo.order_item_name order_name,
+			  		orderinfo.order_time order_date, order_item_sellerName seller,
+			  		orderinfo.order_image order_image
+					from review left outer join orderinfo
+	 				on orderinfo.order_id = review.review_num
+					where review.review_id = #{member_id}
+					order by review.review_reg_date desc) b
+			  where rownum &lt;= #{end}
+			)
+		where rnum &gt;= #{start} and rnum &lt;= #{end}
+	</select>
+	
+	<select id="starAVG" parameterType="int" resultType="Double">
+		select avg(review_score)
+  		from review
+  		where review_item_id = #{review_item_id}
+	</select>
+	
+	<update id="starUpdate" parameterType="product">
+		update item 
+		set ITEM_SCORE = #{ITEM_SCORE}
+		where item_id = #{ITEM_ID}
+	</update>
+		
+	<update id="starUpdate2" parameterType="product">
+		update item 
+		set ITEM_SCORE = #{star_avg}
+		where item_id = #{review_item_id}
+	</update>
+	
+	<select id="getPhoto" resultType="review">
+		select * from review
+		where review_image is not null
+		and review_item_id = #{ITEM_ID}
+		order by review_reg_date desc
+	</select>
+	
+	<select id="getDetail" resultType="review">
+		select * from review
+		where review_num = #{review_num}
+	</select>
+	
+	<delete id="review_del">
+		delete from review
+		where review_num = #{review_num}
+	</delete>
+	
+	<select id="OrderListCount" resultType="int">
+		select count(*) from orderinfo
+		where order_member_id = #{member_id}
+		and TO_TIMESTAMP(TO_CHAR(SYSTIMESTAMP, 'YYYY. MM. DD. AM HH:MI:SS'),'YYYY. MM. DD. AM HH:MI:SS') &lt; TO_TIMESTAMP(order_time, 'YYYY. MM. DD. AM HH:MI:SS') 
+	</select>
+
+	<select id="OrderList" parameterType="String" resultType="OrderInfo">
+		select b.* 
+		from (select * from orderinfo
+			  where order_member_id = #{member_id}
+			  order by order_time asc) b
+		where TO_TIMESTAMP(TO_CHAR(SYSTIMESTAMP, 'YYYY. MM. DD. AM HH:MI:SS'),'YYYY. MM. DD. AM HH:MI:SS') &lt; TO_TIMESTAMP(order_time, 'YYYY. MM. DD. AM HH:MI:SS') 
+	</select>
+	
+	<select id="LastCount" resultType="int">
+		select count(*) from orderinfo
+		where order_member_id = #{member_id}
+		and TO_TIMESTAMP(TO_CHAR(SYSTIMESTAMP, 'YYYY. MM. DD. AM HH:MI:SS'),'YYYY. MM. DD. AM HH:MI:SS') &gt;= TO_TIMESTAMP(order_time, 'YYYY. MM. DD. AM HH:MI:SS') 
+	</select>
+
+	<select id="LastList" parameterType="java.util.Map"	resultType="OrderInfo">
+		select * 
+			from ( select rownum rnum, b.*
+			  from (select orderinfo.* , nvl(cnt,0) cnt
+			  		from orderinfo left outer join (select review.review_num, count(*) cnt 
+			  										from review
+			  										group by review.review_num)r
+			  		on orderinfo.order_id = r.review_num
+					where orderinfo.order_member_id = #{member_id}
+					order by orderinfo.order_id desc) b
+			  where rownum &lt;= #{end}
+			  and TO_TIMESTAMP(TO_CHAR(SYSTIMESTAMP, 'YYYY. MM. DD. AM HH:MI:SS'),'YYYY. MM. DD. AM HH:MI:SS') &gt;= TO_TIMESTAMP(order_time, 'YYYY. MM. DD. AM HH:MI:SS') 
+			)
+		where rnum &gt;= #{start} and rnum &lt;= #{end}
+	</select>
+	
+	<delete id="order_delete" parameterType="int">
+		delete orderinfo
+		where order_id = #{order_id}
+	</delete>
+	
+	<select id="findScheduleListBySeller" parameterType="String" resultType="Sch">
+		select * from sch
+		where sch_seller = #{seller_id}
+	</select>
+	
+	
+	<select id="order_info" parameterType="int"	resultType="OrderInfo">
+		select orderinfo.*
+		from orderinfo 
+		where order_id=#{order_id}
+		and TO_TIMESTAMP(TO_CHAR(SYSTIMESTAMP, 'YYYY. MM. DD. AM HH:MI:SS'),'YYYY. MM. DD. AM HH:MI:SS') &lt; TO_TIMESTAMP(order_time, 'YYYY. MM. DD. AM HH:MI:SS')
+	</select>
+	
+	<select id="order_info_last" parameterType="int" resultType="OrderInfo">
+		select orderinfo.*, nvl(cnt,0) cnt
+		from orderinfo left outer join (select review.review_num, count(*) cnt 
+							  			 from review
+							  			 group by review.review_num)r
+		on orderinfo.order_id = r.review_num
+		where order_id=#{order_id}
+		and TO_TIMESTAMP(TO_CHAR(SYSTIMESTAMP, 'YYYY. MM. DD. AM HH:MI:SS'),'YYYY. MM. DD. AM HH:MI:SS') &gt;= TO_TIMESTAMP(order_time, 'YYYY. MM. DD. AM HH:MI:SS')
+	</select>
+	
+	
+	
+	<insert id="addEvent" parameterType="hashmap">
+		insert into sch
+		values
+		(sch_seq.NEXTVAL, order_seq.nextval -1 ,#{sch_title}, #{sch_start}, #{sch_seller})
+	</insert>
+	
+	<insert id="add_red_Event">
+		insert into sch
+		values
+		(sch_seq.NEXTVAL, null, #{sch_title}, #{sch_start}, #{sch_seller})
+	</insert>
+  
+  
+</mapper>

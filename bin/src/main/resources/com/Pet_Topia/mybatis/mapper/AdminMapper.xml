@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?><!--  SQL 맵퍼 파일은 xml이기 때문에 제일 먼저 xml 선언이 옵니다. -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.Pet_Topia.mybatis.mapper.AdminMapper">
+
+ 	
+ 	<select id="getSearchList" parameterType="map" resultType="member">
+	  select * 
+	  from ( select rownum rnum, b.*
+	          from  (select * 
+	                 from member  
+	                 where member_id != 'admin'
+	                 <include refid="search_"/>
+	                   order by member_id
+	                  )b 
+	           where rownum &lt;=  #{end}    
+	        ) 
+	  where rnum &gt;= #{start} and rnum  &lt;=  #{end} 
+	</select>
+	
+	
+	
+
+
+ 	 <select id="getSearchListCount" parameterType="map" resultType="int">
+      select count(*) 
+      from member 
+      where member_id != 'admin'
+      <include refid="search_"/>
+   </select>
+	 
+	  <sql id="search_">
+	   <if test="search_field!=null">
+	                         and	           
+	                         <choose>
+	                           <when test="search_field=='id'">MEMBER_ID</when>
+	                           <when test="search_field=='name'">MEMBER_NAME</when>
+	                        </choose>	  
+	                            like #{search_word}	     
+      	                </if>
+	  </sql>
+	  
+	  <delete id="delete" parameterType="String">
+	  delete from member where member_id = #{id}
+	  
+	  
+	  </delete>
+
+	<select id="searchCount" parameterType="map" resultType="int">
+	   select count(*) 
+	   from member 
+	   where member_id != 'admin'
+	  <if test="search_field!=null">
+	      and 
+	      <choose>
+	           <when test="search_field=='id'">MEMBER_ID</when>
+	           <when test="search_field=='name'">MEMBER_NAME</when>
+	       </choose>	  
+	       like #{search_word}
+	  </if>
+	</select>
+	
+	<select id="listAll" resultType="member">
+		select * from member
+		order by member_id
+	</select>
+
+
+  <select id="getAdminNoticeListCount" resultType="int">
+		select count(*) from Adn where ADN_MAINCOLUMN =0
+	</select>
+
+
+<select id="getadminNoticeList" parameterType="java.util.Map" resultType="Abn">
+		select * from
+			(select rownum rnum, b.*
+			 from
+			 	(select * from Adn
+			 	 order by ADN_MAINCOLUMN desc,
+			 	 ADN_DATE desc) b
+			 where rownum &lt;= #{end}
+			)
+		where rnum &gt;= #{start} and rnum &lt;= #{end}	
+	</select>
+
+
+
+
+
+
+
+
+
+
+
+
+ 	
+</mapper>

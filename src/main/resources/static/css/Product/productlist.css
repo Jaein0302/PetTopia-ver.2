@@ -1,0 +1,9 @@
+	.search {
+		width : 600px;
+		margin: 0 auto;
+	}
+	#search_word {width:70%; display : inline}
+	
+	#search_button {display : inline}
+	
+	.body {margin-top : 210px}

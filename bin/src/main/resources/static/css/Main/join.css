@@ -1,0 +1,133 @@
+* {box-sizing: border-box}
+
+input, select{border-radius:3px;border:1px solid lightgray}
+
+select:focus{outline:none}
+select{color: #6F6F6F;}
+
+.jinput {
+    width: 100%;
+    padding: 10px;
+    margin: 5px 0 22px 0;
+    display: inline-block;
+    font-family:'NanumGothic';
+    background: #f5f5f5;
+    font-size: 0.8rem;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    border: none;
+    box-shadow: inset 0px 2px 3px rgba( 0,0,0,0.08 );
+    clear: both;
+}
+
+
+
+.mform {
+    background-color: #fefefe;
+    margin: 1% auto 15% auto; /* 5% from the top, 15% from the bottom and centered */
+    width: 550px; /* Could be more or less, depending on screen size */
+    padding: 16px;
+}
+
+hr {
+    border: 1px solid #f1f1f1;
+    margin-bottom: 25px;
+}
+ 
+.jinput + div{width: 100%;
+    padding: 10px;
+    margin: 5px 0 22px 0;
+    display: inline-block;
+    border: none;
+    }
+
+/* Clear floats */
+.clearfix{
+	margin: 39px 32.5px;
+}
+
+.clearfix::after {
+    content: "";
+    clear: both;
+    display: table; 
+}
+
+h1{text-align:center}
+
+b {
+	width: 100%;
+	display: block
+}
+
+.message{display:inline-block;margin-top:-20px;font-size:13px}
+
+/* Change styles for cancel button and signup button on extra small screens */
+@media screen and (max-width: 300px) {
+    .cancelbtn, .signupbtn {
+       width: 100%;
+    }
+}
+
+/* 버튼 */
+.button-5 {
+  align-items: center;
+  background-clip: padding-box;
+  background-color: #53ca93;
+  border: 1px solid transparent;
+  border-radius: .25rem;
+  box-shadow: rgba(0, 0, 0, 0.02) 0 1px 3px 0;
+  box-sizing: border-box;
+  color: #fff;
+  cursor: pointer;
+  display: inline-flex;
+  font-family: "JUA",sans-serif;
+  font-size: 26px;
+  justify-content: center;
+  line-height: 1;
+  margin: 0 37px;
+  min-height: 42px;
+  padding: 14px 20px;
+  position: relative;
+  text-decoration: none;
+  transition: all 250ms;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  vertical-align: baseline;
+  width: 150px;
+}
+.button-5:hover {transform: translateY(-1px);}
+
+
+/* 우편번호 버튼 */
+.postb{font-size:17px;width:94px;height:17px!important; margin:0!important;  background-color: #f0c16a;}
+.postb:hover,.postb:focus {
+  background-color: #ffa826!important;
+  box-shadow: rgba(0, 0, 0, 0.1) 0 4px 12px;
+}
+.postb:active {background-color: #ffa826;
+  box-shadow: rgba(0, 0, 0, .06) 0 2px 4px;
+  transform: translateY(0);
+}
+/* 수정 버튼 */
+.button-5:hover,.button-5:focus {
+  background-color: #46e69e;
+  box-shadow: rgba(0, 0, 0, 0.1) 0 4px 12px;
+}
+.button-5:active {background-color: #46e69e;
+  box-shadow: rgba(0, 0, 0, .06) 0 2px 4px;
+  transform: translateY(0);
+}
+/* 탈퇴 버튼 */
+.signoutb{background-color: tomato;}
+.signoutb:hover,.signoutb:focus {
+  background-color: #ff5744;
+  box-shadow: rgba(0, 0, 0, 0.1) 0 4px 12px;
+}
+.signoutb:active {background-color: #ff5744;
+  box-shadow: rgba(0, 0, 0, .06) 0 2px 4px;
+  transform: translateY(0);
+}
+
+.fa-check{color:#6dc99f}

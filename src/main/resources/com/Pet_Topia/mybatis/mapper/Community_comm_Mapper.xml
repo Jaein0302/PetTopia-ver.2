@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?><!-- SQL 맵퍼 파일은 xml이기 때문에 제일 먼저 xml 
+	선언이 옵니다. -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.Pet_Topia.mybatis.mapper.Community_comm_Mapper">
+
+<select id="getListCount" resultType="int" parameterType="int">
+		select count(*) from community_comm
+		where comment_commu_num = #{comment_commu_num}
+	</select>
+	
+	<select id="getCommentList" parameterType="map" resultType="Community_comm">
+	select * 
+		from(select rownum rnum, c.*
+		  from(select *
+		  		 from community_comm
+		  		 where comment_commu_num = #{comment_commu_num}
+		  		 order by comment_date desc
+		  		 ) c
+		  where rownum &lt;= #{end}
+		)
+		where rnum between #{start} and #{end}
+	</select>
+	
+	<insert id="commentsInsert" parameterType="Community_comm">
+		insert into community_comm
+		values(comm_seq.nextval, #{comment_name}, #{comment_content}, sysdate, #{comment_commu_num})
+	</insert>
+	
+	<update id="commentsUpdate" parameterType="Community_comm">
+		update community_comm
+		set comment_content=#{comment_content}
+		where comment_num=#{comment_num}
+	</update>
+	
+	<delete id="commentsDelete" parameterType="int">
+		delete community_comm
+		where comment_num = #{comment_num}
+	</delete>
+
+	<select id="getMyCommentListCount" parameterType="String" resultType="int">
+		select count(*) from community_comm
+		where comment_name= #{member_id}
+	</select>
+	
+	<select id="getMyCommentList" parameterType="java.util.Map"	resultType="Community_comm">
+		select * 
+			from ( select rownum rnum, b.*
+			  from (select community_comm.*
+					from community_comm 
+					where comment_name = #{member_id}
+					order by comment_date desc) b
+			  where rownum &lt;= #{end}
+			)
+		where rnum &gt;= #{start} and rnum &lt;= #{end}
+	</select>
+
+</mapper>

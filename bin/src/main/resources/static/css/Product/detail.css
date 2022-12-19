@@ -1,0 +1,69 @@
+
+.fakeimg {
+    height: 350px;
+    width: 350px;
+    background: #aaa;
+  }
+  
+ b{font-size:1.5rem;}
+ p{text-align:left;font-weight:bold;}
+ .total td{width:42%}
+ .explain{width:auto;text-align:center;font-weight:bold;font-size:1.5rem;}
+
+.tab body {
+            color: #555;
+            background: #eeeeee;
+            margin:0;
+            padding: 0;
+            box-sizing: border-box;}
+
+.tab h1 {
+            padding: 50px 0;
+            font-weight: 400;
+            text-align: center;}
+
+.tab p {
+            margin: 0 0 20px;
+            line-height: 1.5;}
+
+.tab .main {
+            min-width: 320px;
+            max-width: 800px;
+            padding: 50px;
+            margin: 0 auto;
+            background: #ffffff;}
+            
+.tab section {
+            display: none;
+            padding: 20px 0 0;
+            border-top: 1px solid #ddd;}
+
+        /*라디오버튼 숨김*/
+.tab input {
+              display: none;}
+
+.tab label {
+            display: inline-block;
+            margin: 0 0px -1px;
+            padding: 15px 76px;
+            font-weight: 600;
+            text-align: center;
+            color: #bbb;
+            border: 1px solid transparent;}
+
+.tab label:hover {
+            color: #2e9cdf;
+            cursor: pointer;}
+
+        /*input 클릭시, label 스타일*/
+.tab input:checked + label {
+              color: #555;
+              border: 1px solid #ddd;
+              border-top: 1px solid black;
+              border-bottom: 1px solid #ffffff;}
+
+        #tab1:checked ~ #content1,
+        #tab2:checked ~ #content2,
+        #tab3:checked ~ #content3,
+        #tab4:checked ~ #content4 {
+            display: block;}

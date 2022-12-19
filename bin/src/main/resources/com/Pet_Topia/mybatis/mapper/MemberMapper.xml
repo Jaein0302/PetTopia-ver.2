@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8" ?><!-- SQL 맵퍼 파일은 xml이기 때문에 제일 먼저 xml 
+	선언이 옵니다. -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.Pet_Topia.mybatis.mapper.MemberMapper">
+
+	<select id="isId" resultType="member" parameterType="String">
+		select * from member where member_id = #{member_id}
+	</select>
+	
+	<select id="isRegnum" resultType="member" parameterType="String">
+		select * from member where member_regnum = #{member_regnum}
+	</select>
+	
+	<insert id="insert" parameterType="member">
+		insert into member 
+		values (#{member_id},#{member_password},#{member_name},
+		#{member_post},#{member_address},#{member_email},
+		#{member_tell},#{member_btype, jdbcType=VARCHAR},
+		#{member_regnum, jdbcType=VARCHAR},#{auth} )
+	</insert>
+	
+	<select id="find_id" resultType="String" parameterType="String">
+		select member_id from member
+		where member_name=#{member_name} and member_email=#{member_email}
+	</select>
+	
+   	<select id="find_pass" resultType="member" parameterType="String">
+		select * from member
+		where member_id=#{member_id}
+		and member_name =#{member_name}
+		and member_email=#{member_email}
+	</select>
+	
+	<update id="update_pass" parameterType="String">
+		update member set member_password = #{str}
+		where member_id=#{member_id} 
+	</update>
+	
+	<select id="mail_code" resultType="member" parameterType="String">
+		select * from member
+		where member_email=#{member_email}
+	</select>
+	
+	<update id="update" parameterType="member">
+		update member
+		set
+		member_name = #{member_name},
+		member_post = #{member_post},
+		member_address = #{member_address},
+		member_email = #{member_email}
+		where member_id = #{member_id}
+	</update>
+	
+	<select id="Id_pw_check"  parameterType="String" resultType="member">
+		select * from member
+		where member_id = #{id}
+		and member_password = #{encPassword}
+	</select>
+	
+	<delete id="Delete_user" parameterType="String">
+		delete from member
+		where member_id = #{member_id}
+	</delete>
+	
+	<select id="getMemberdata" parameterType="String" resultType="member">
+		select * from member
+		where member_id = #{id}
+	</select>
+   
+    <select id="search_item" resultType="product">
+      select *  
+      from item
+      where (ITEM_CONTENT like #{item}
+      or ITEM_NAME like #{item})
+    </select>
+    
+    <select id="search_treat" resultType="product">
+      select *  
+      from item
+      where ITEM_CATEGORY = 'treat'
+      and (ITEM_CONTENT like #{item}
+      or ITEM_NAME like #{item})
+    </select> 
+    
+    <select id="search_edu" resultType="product">
+      select *  
+      from item
+      where ITEM_CATEGORY = 'education'
+      and (ITEM_CONTENT like #{item}
+      or ITEM_NAME like #{item})
+    </select> 
+    
+    <select id="search_beauty" resultType="product">
+      select *  
+      from item
+      where ITEM_CATEGORY = 'beauty'
+      and (ITEM_CONTENT like #{item}
+      or ITEM_NAME like #{item})
+    </select> 
+   
+   <select id="search_item_count" resultType="int">
+   	select count(*)
+   	from item
+    where (ITEM_CONTENT like #{item}
+    or ITEM_NAME like #{item})
+   </select>
+   
+   <select id="search_treat_count" resultType="int">
+      select count(*)
+      from item
+      where ITEM_CATEGORY = 'treat'
+      and (ITEM_CONTENT like #{item}
+      or ITEM_NAME like #{item})
+    </select> 
+    
+    <select id="search_edu_count" resultType="int">
+      select count(*) 
+      from item
+      where ITEM_CATEGORY = 'education'
+      and (ITEM_CONTENT like #{item}
+      or ITEM_NAME like #{item})
+    </select> 
+    
+    <select id="search_beauty_count" resultType="int">
+      select count(*)  
+      from item
+      where ITEM_CATEGORY = 'beauty'
+      and (ITEM_CONTENT like #{item}
+      or ITEM_NAME like #{item})
+    </select> 
+    
+    <select id="best_item" resultType="product">
+      select item.*,  nvl(cnt,0) cnt
+	  from item left outer join (select review.review_item_id, count(*) cnt
+									from review
+									group by review_item_id) c
+	  on item.item_id = c.review_item_id
+      order by item.ITEM_SCORE asc
+    </select>
+</mapper>

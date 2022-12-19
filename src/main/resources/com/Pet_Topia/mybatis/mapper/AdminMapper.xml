@@ -1,0 +1,361 @@
+<?xml version="1.0" encoding="UTF-8" ?><!--  SQL 맵퍼 파일은 xml이기 때문에 제일 먼저 xml 선언이 옵니다. -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.Pet_Topia.mybatis.mapper.AdminMapper">
+
+
+<!--  public class AdminServiceImpl implements AdminService  -->
+
+
+<!-- AdminServiceImpl 멤버 아이디 및 수-->
+
+  <sql id="search_">
+      <if test="search_field!=null">
+                            and              
+                            <choose>
+                              <when test="search_field=='id'">MEMBER_ID</when>
+                              <when test="search_field=='name'">MEMBER_NAME</when>
+                           </choose>     
+                               like #{search_word}        
+                         </if>
+     </sql>
+     
+     
+    <select id="getSearchMemberListCount" parameterType="map" resultType="int">
+      select count(*) 
+      from member 
+      where member_id != 'admin'
+      <include refid="search_"/>
+   </select>
+    
+    <select id ="getSearchMemberList"  parameterType="map" resultType="member">
+      
+       select * from
+         (select rownum rnum, b.*
+          from
+             (select * from member
+              where member_id != 'admin'
+              
+               <include refid="search_"/>
+              
+              order by member_id desc
+              ) b
+          where rownum &lt;= #{end}
+         )
+      where rnum &gt;= #{start} and rnum &lt;= #{end}   
+    
+    
+    </select>
+    
+    
+    
+   
+     
+     
+     
+     
+     
+     <!--  AdminServiceImpl 엑셀 및 pdf처리 .  -->
+     <select id="listAll" resultType="member">
+      select * from member
+      order by member_id
+     </select>
+     
+     <!--   AdminServiceImpl Abn 공지사항 수를 출력함.-->
+   <select id="getAdminListCount" resultType="int">
+   select * count(*) from Abn 
+   </select>
+     
+     
+     
+     
+    <!--  관리자를 제외한 리스트를 페이지 처리함. -->
+    <select id="getSearchList" parameterType="map" resultType="member">
+     select * 
+     from ( select rownum rnum, b.*
+             from  (select * 
+                    from member  
+                    where member_id != 'admin'
+                    <include refid="search_"/>
+                      order by member_id
+                     )b 
+              where rownum &lt;=  #{end}    
+           ) 
+     where rnum &gt;= #{start} and rnum  &lt;=  #{end} 
+   </select>
+   
+   
+   
+   
+   
+   <!--  *** 공지사항 관련 ***  *** 공지사항 관련 *** *** 공지사항 관련 *** *** 공지사항 관련 ***-->
+   
+   <!--  공지사항 게시물 관련 페이지 처리 일반. -->
+<select id="getadminNoticeList" parameterType="java.util.Map" resultType="Abn">
+      select * from
+         (select rownum rnum, b.*
+          from
+             (select * from Abn
+              where ABN_DIVISION = #{division}
+              order by ABN_NUMBER desc
+              ) b
+          where rownum &lt;= #{end}
+         )
+      where rnum &gt;= #{start} and rnum &lt;= #{end}   
+   </select>
+   
+   
+   
+   
+   
+
+   <select id="searchCount" parameterType="map" resultType="int">
+      select count(*) 
+      from member 
+      where member_id != 'admin'
+     <if test="search_field!=null">
+         and 
+         <choose>
+              <when test="search_field=='id'">MEMBER_ID</when>
+              <when test="search_field=='name'">MEMBER_NAME</when>
+          </choose>     
+          like #{search_word}
+     </if>
+   </select>
+   
+  <select id="getAdminNoticeListCount" resultType="int">
+      select count(*) from ABN 
+         </select>
+
+
+<!--  공지사항 글 쓰기.. -->
+   <insert id="admin_write_notice" parameterType="Abn">
+      <selectKey resultType="int" order="BEFORE" keyProperty="ABN_NUMBER">
+         select nvl(max(ABN_NUMBER),0)+1 from ABN
+      </selectKey>
+      insert into Abn
+      values
+      (#{ABN_NUMBER},
+      #{ABN_NAME}, 
+      #{ABN_DIVISION},
+      #{ABN_SUBJECT}, 
+      #{ABN_CONTENT}, 
+      sysdate,
+      #{ABN_FILE, jdbcType=VARCHAR},
+      #{ABN_ORIGINAL, jdbcType=VARCHAR})
+   </insert>
+   
+      
+
+
+   <!--  공지사항 디테일 -->
+   
+   
+   <select id ="getNoticeDetail" resultType="Abn" parameterType="int">
+   
+   select * from abn where ABN_NUMBER = #{ABN_NUMBER}
+   
+   
+   </select>
+   
+   <!--  공지사항 일반글 업데이트하기 일반 -->
+   
+   <update id="admin_write_notice_update" parameterType="java.util.Map">
+   
+       update Abn
+      set ABN_SUBJECT = #{ABN_SUBJECT}, ABN_CONTENT =#{ABN_CONTENT}
+      where ABN_NUMBER = #{ABN_NUMBER}
+   
+   
+   </update>
+
+
+
+   <!--  공지사항 메인글 가져오기  -->
+   <select id="getDivisionMain" resultType="Abn" parameterType="String">
+   select * from Abn
+   where ABN_DIVISION = #{ABN_DIVISION}
+   order by ABN_NUMBER desc
+   </select>
+   <!--  메인은 카운터는 필요없다. 나중에 추후에 처리... 시간남으면 개수 제한주는식으로. -->
+   
+   
+   <select id="getdivision" resultType="Abn" parameterType="String">
+   select * from Abn
+   where ABN_DIVISION = #{ABN_DIVISION}
+   order by ABN_NUMBER desc
+   </select>
+   
+   <select id="getDivisionCount" resultType="int" >
+     select count(*) from abn where ABN_DIVISION ='일반'
+   </select>
+      
+   <delete id="deleteNotice" parameterType="int">
+   
+   delete from abn
+   where abn_number = #{abn_number}
+   
+   </delete>
+   
+   
+   
+   
+   
+   <!--  이건 추후에 생각 카운트를 넘으면 출력이 안되도록. 
+   일반글때문에 필요할듯.
+   
+   
+   //공지사항 메인 카운트
+      public int division_main_count(String division) {
+         return dao.division_main_count(division);
+      }
+      -->
+
+
+
+
+
+
+
+
+
+
+
+   <!--  *** 공지사항 관련 ***  *** 공지사항 관련 *** *** 공지사항 관련 *** *** 공지사항 관련 ***-->
+   
+<!-- AdminServiceImpl 끝.......  -->
+
+
+<!--  관리자의 기능 회원목록 불러오기 검색 등등 -->
+
+  
+  <select id="getAskColumnList" parameterType="java.util.Map" resultType="Aam">
+      select *  from
+       (select b.*, rownum rnum  
+
+       		from (select *
+       			  from Aam where
+
+       			  <if test="CHECK ==null">
+       			    AAM_ANSCHECK IN ('답변대기','답변완료') and
+       			  </if>
+       			  <if test="CHECK=='NOT'">
+       			   AAM_ANSCHECK = '답변대기' and 
+       			  </if>
+       			  <if test="CHECK=='DONE'">
+       			   AAM_ANSCHECK = '답변완료' and 
+       			  </if>
+          <if test="search_field=='SUBJECT'">AAM_SUBJECT like #{search_word} </if>
+          <if test="search_field=='NAME'">AAM_NAME like #{search_word} </if>
+            	
+            	order by AAM_ANSCHECK ASC
+            	
+            	) b
+            	where rownum &lt;= #{end}
+             )
+      where rnum &gt;= #{start} and rnum &lt;= #{end}
+   </select> 
+
+   
+   
+   
+   
+   
+   
+   
+   <select id="getAskColumnListCount" parameterType="map" resultType="int">
+      select count(*) 
+      from Aam where
+       			  <if test="CHECK ==null">
+       			    AAM_ANSCHECK IN ('답변대기','답변완료') and
+       			  </if>
+       			  <if test="CHECK=='NOT'">
+       			   AAM_ANSCHECK = '답변대기' and 
+       			  </if>
+       			  <if test="CHECK=='DONE'">
+       			   AAM_ANSCHECK = '답변완료' and 
+       			  </if>
+          <if test="search_field=='SUBJECT'">AAM_SUBJECT like #{search_word} </if>
+          <if test="search_field=='NAME'">AAM_NAME like #{search_word} </if>
+   </select>
+
+
+      <select id="getAskMemberOwnList" parameterType="java.util.Map" resultType="Aam">
+
+         select * from
+         (select rownum rnum, b.*
+          from
+             (select * from Aam where AAM_NAME = #{login_id}
+              order by AAM_NUMBER desc) b
+          where rownum &lt; #{end}
+         )
+      where rnum &gt;= #{start} and rnum &lt;= #{end}
+   
+   </select>
+ 
+   <select id="getAskMemberOwnListCount" parameterType="String" resultType="int">
+   
+   select count(*) from Aam
+   where AAM_NAME = #{login_id}
+   
+   </select>
+   
+   
+   <select id ="ask_to_admin_view" parameterType="int" resultType="Aam">
+   
+   select * from Aam where AAM_NUMBER = #{num}
+   </select>
+
+   
+   <select id ="getComent"  parameterType="int" resultType="Aac">
+   
+   select * from Aac where AAC_NUMBER = #{AAC_NUMBER}
+   
+   </select>
+   
+   <!--  질문글 처음 답변 합니다. -->
+   
+   <insert id="Admin_ask_comment" parameterType="Aac" >
+      insert into AAC (AAC_NUMBER,AAC_CONTENT,AAC_DATE)
+      values(#{AAC_NUMBER},
+       #{AAC_CONTENT},
+       sysdate)
+      
+   </insert>
+   
+
+
+   <update id="Admin_ask_comment_update" parameterType="Aac" >
+
+      update Aac
+      set AAC_CONTENT = #{AAC_CONTENT}
+      where AAC_NUMBER = #{AAC_NUMBER}
+   
+   </update>
+
+
+   <update id="AnswerUpdate" parameterType="int">
+   
+       update Aam
+      set AAM_ANSCHECK = '답변완료'
+      where AAM_NUMBER = #{num}
+   
+   
+   </update>
+
+
+
+<insert id="write_to_admin_form" parameterType="Aam" >
+   insert into Aam
+   (AAM_NUMBER, AAM_NAME, AAM_SUBJECT, AAM_CONTENT, 
+    AAM_DATE,AAM_ANSCHECK) 
+      values(Aam_seq.nextval, #{AAM_NAME},#{AAM_SUBJECT},
+      #{AAM_CONTENT},sysdate,'답변대기')
+      
+   </insert>
+   
+   
+   
+
+</mapper>
